@@ -5,10 +5,7 @@ php:
 install:
  - composer global require "squizlabs/php_codesniffer=*"
 
-before_script:
- - phpcs --version
-
 script: 
  - phpunit --configuration tests/phpunit.xml 
- - phpcs --standard=PSR2 lib/*
+ - exec vendor/bin/phpcs --standard=PSR2 lib/*
 
