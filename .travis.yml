@@ -2,4 +2,7 @@ language: php
 php:
  - nightly
 
-script: phpunit --configuration tests/phpunit.xml 
+script: a
+ - phpunit --configuration tests/phpunit.xml 
+ - phpcs --standard=PSR2 lib/*
+
