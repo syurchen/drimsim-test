@@ -5,11 +5,11 @@ include "../lib/MemCache.php";
 
 use PHPUnit\Framework\TestCase;
 
-final class MainTest extends TestCase
+final class MainTestAsync extends TestCase
 {
 
 	public function testConnect(){
-		$Mem = new \Drimsim\Memcache("localhost", 11211);
+		$Mem = new \Drimsim\Memcache("localhost", 11211, true);
 		$this->assertTrue($Mem instanceof \Drimsim\Memcache);
 		return $Mem;
 	}

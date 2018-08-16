@@ -10,9 +10,15 @@ class MemCache {
 
 	const expTime = 3600;
 
+	const timeoutSec = 1;
+
+	const timeoutMicro = 0;
+
 	private $socket;
 
-	public function __construct(string $ip, int $port) {
+	private $async;
+
+	public function __construct(string $ip, int $port, bool $async = false) {
 
 		if (false === $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP))
 			return false;
@@ -20,7 +26,12 @@ class MemCache {
 		if (!socket_connect($this->socket, $ip, $port))
 			return false;
 
-		socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => 1, "usec" => 0));
+		socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => self::timeoutSec, "usec" => self::timeoutMicro));
+
+		$this->async = $async;
+
+		if ($this->async)		
+			socket_set_nonblock($this->socket);
 	}
 
 	public function __destruct() {
@@ -33,14 +44,34 @@ class MemCache {
 	}
 	
 	private function read(){
+		$string = '';
 		
-		$string = socket_read($this->socket, self::readLength);
+		if ($this->async){
+			$timeout = microtime(true) + self::timeoutSec + self::timeoutMicro;
+		}
+		while (true) {
+			$chunk = socket_read($this->socket, self::readLength);
 
-		//echo "read {$string} \n\n";
+			if (!$this->async){
+				if ($chunk)
+					$string = trim($chunk);
+				break;
+			}
+			if ($chunk === false){
+				if (!in_array(socket_last_error($this->socket), [11, 115]) || microtime(true) >= $timeout)
+					break;
+				else {
+					continue;
+				}
+			}
 
-		if ($string)
-			$string = trim($string);
-		return $string;
+			if ($chunk == '')
+				break;
+
+			$string .= $chunk;			
+		}
+
+		return trim($string);
 	}
 
 	public function checkError(){
