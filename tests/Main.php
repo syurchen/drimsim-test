@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-include "../lib/MemCache.php";
-
 use PHPUnit\Framework\TestCase;
 
 final class MainTest extends TestCase

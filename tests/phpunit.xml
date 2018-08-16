@@ -1,0 +1,8 @@
+<phpunit bootstrap="../vendor/autoload.php">
+  <testsuites>
+    <testsuite name="mem">
+      <file>Main.php</file>
+      <file>MainAsync.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>
